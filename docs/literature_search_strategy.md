@@ -14,9 +14,11 @@ This workflow builds a public-metadata candidate pool for PERD literature curati
 
 Each candidate record uses the following schema:
 
-`candidate_id, batch_id, title, normalized_title, doi, year, journal, authors, abstract, keywords, material_family_guess, topic_tags, query_used, source_api, source_url, openalex_id, semantic_scholar_id, crossref_id, arxiv_id, citation_count, is_open_access, retrieved_date, screening_status, screening_decision, screening_reason, notes`
+`candidate_id, batch_id, title, normalized_title, doi, year, journal, authors, abstract, keywords, relevance_score, exclusion_hint, material_family_guess, topic_tags, query_used, source_api, source_url, openalex_id, semantic_scholar_id, crossref_id, arxiv_id, citation_count, is_open_access, retrieved_date, screening_status, screening_decision, screening_reason, notes`
 
 `screening_status` starts as `unreviewed`. Reviewers later fill `screening_decision`, `screening_reason`, and `notes`.
+
+`relevance_score` is a 0-1 metadata-only heuristic. It rewards LLZO/LLZTO/garnet/Li7La3Zr2O12 mentions, doping language, conductivity/activation-energy terms, cell-performance terms, and solid-electrolyte wording. `exclusion_hint` flags likely non-target records such as `polymer_only`, `liquid_electrolyte_only`, `electrode_only`, or `review_only`; reviewers should treat it as a triage hint rather than an automatic exclusion.
 
 ## Batch Scope
 
@@ -110,5 +112,7 @@ The candidate pool is not the curated database. After deduplication:
 - Deduplicated pool: `data/processed/literature_candidates_dedup.csv`
 - Summary JSON: `outputs/reports/literature_pool_summary.json`
 - Summary Markdown: `outputs/reports/literature_pool_summary.md`
+
+Summaries include high, medium, low, and likely irrelevant relevance counts to help prioritize manual screening.
 
 Generated candidate pools are reproducible metadata outputs and should be reviewed before any scientific interpretation.

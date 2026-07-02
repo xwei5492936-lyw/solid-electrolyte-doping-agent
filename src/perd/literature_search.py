@@ -71,6 +71,8 @@ CANDIDATE_FIELDS = [
     "authors",
     "abstract",
     "keywords",
+    "relevance_score",
+    "exclusion_hint",
     "material_family_guess",
     "topic_tags",
     "query_used",
@@ -168,6 +170,87 @@ def infer_topic_tags(text: str) -> str:
     return ";".join(tags)
 
 
+def infer_exclusion_hint(record: dict[str, str]) -> str:
+    """Flag likely screening exclusions without dropping candidate records."""
+
+    text = _record_text(record)
+    has_solid_electrolyte = "solid electrolyte" in text or "solid-state electrolyte" in text
+    has_garnet_or_oxide = any(term in text for term in ["garnet", "llzo", "llzto", "li7la3zr2o12", "oxide"])
+    has_electrolyte_family = has_garnet_or_oxide or any(
+        term in text for term in ["nasicon", "latp", "lagp", "sulfide", "argyrodite", "halide"]
+    )
+    hints: list[str] = []
+    if ("review" in text or "overview" in text or "perspective" in text) and not any(
+        term in text for term in ["original research", "experimental study"]
+    ):
+        hints.append("review_only")
+    if ("polymer electrolyte" in text or "polymer-only" in text or "polymer only" in text) and not has_garnet_or_oxide:
+        hints.append("polymer_only")
+    if "liquid electrolyte" in text and not has_solid_electrolyte and not has_electrolyte_family:
+        hints.append("liquid_electrolyte_only")
+    if (
+        any(term in text for term in ["cathode", "anode"])
+        and not has_solid_electrolyte
+        and not has_electrolyte_family
+        and "electrolyte" not in text
+    ):
+        hints.append("electrode_only")
+    return ";".join(hints)
+
+
+def _record_text(record: dict[str, str]) -> str:
+    return " ".join(
+        str(record.get(field, ""))
+        for field in ["title", "abstract", "keywords", "journal", "topic_tags", "material_family_guess"]
+    ).lower()
+
+
+def calculate_relevance_score(record: dict[str, str]) -> float:
+    """Calculate a 0-1 literature-candidate relevance score."""
+
+    text = _record_text(record)
+    score = 0.05
+    positive_groups = [
+        (["llzo", "llzto", "garnet", "li7la3zr2o12"], 0.22),
+        (["doped", "doping", "substituted", "co-doped", "codoped", "dopant"], 0.16),
+        (["ionic conductivity", "activation energy"], 0.16),
+        (["lithium symmetric cell", "li symmetric cell", "critical current density", "full cell"], 0.18),
+        (["solid electrolyte", "solid-state electrolyte"], 0.14),
+        (["nasicon", "latp", "lagp", "sulfide", "argyrodite", "halide"], 0.08),
+    ]
+    for needles, weight in positive_groups:
+        if any(needle in text for needle in needles):
+            score += weight
+
+    hint = infer_exclusion_hint(record)
+    if "polymer_only" in hint:
+        score -= 0.35
+    if "liquid_electrolyte_only" in hint:
+        score -= 0.4
+    if "electrode_only" in hint:
+        score -= 0.35
+    if "review_only" in hint:
+        score -= 0.05
+    return round(max(0.0, min(1.0, score)), 4)
+
+
+def enrich_candidate_record(record: dict[str, str]) -> dict[str, str]:
+    """Ensure a candidate record has the current schema and relevance fields."""
+
+    enriched = {field: str(record.get(field, "")) for field in CANDIDATE_FIELDS}
+    if not enriched["normalized_title"]:
+        enriched["normalized_title"] = normalize_title(enriched.get("title", ""))
+    if not enriched["material_family_guess"]:
+        enriched["material_family_guess"] = infer_material_family(_record_text(enriched))
+    if not enriched["topic_tags"]:
+        enriched["topic_tags"] = infer_topic_tags(_record_text(enriched))
+    if not enriched["exclusion_hint"]:
+        enriched["exclusion_hint"] = infer_exclusion_hint(enriched)
+    if not enriched["relevance_score"]:
+        enriched["relevance_score"] = str(calculate_relevance_score(enriched))
+    return enriched
+
+
 def candidate_from_openalex_work(work: dict, batch_id: int, query: str, retrieved: str) -> dict[str, str]:
     """Convert an OpenAlex work object to the PERD candidate schema."""
 
@@ -201,6 +284,8 @@ def candidate_from_openalex_work(work: dict, batch_id: int, query: str, retrieve
         "authors": authors,
         "abstract": abstract,
         "keywords": keywords,
+        "relevance_score": "",
+        "exclusion_hint": "",
         "material_family_guess": infer_material_family(text_blob),
         "topic_tags": infer_topic_tags(text_blob),
         "query_used": query,
@@ -218,7 +303,7 @@ def candidate_from_openalex_work(work: dict, batch_id: int, query: str, retrieve
         "screening_reason": "",
         "notes": "Synthetic-free public metadata record; no PDF downloaded.",
     }
-    return {field: str(record.get(field, "")) for field in CANDIDATE_FIELDS}
+    return enrich_candidate_record(record)
 
 
 def _strip_markup(text: str) -> str:
@@ -259,6 +344,8 @@ def candidate_from_crossref_item(item: dict, batch_id: int, query: str, retrieve
         "authors": authors,
         "abstract": abstract,
         "keywords": keywords,
+        "relevance_score": "",
+        "exclusion_hint": "",
         "material_family_guess": infer_material_family(text_blob),
         "topic_tags": infer_topic_tags(text_blob),
         "query_used": query,
@@ -276,7 +363,7 @@ def candidate_from_crossref_item(item: dict, batch_id: int, query: str, retrieve
         "screening_reason": "",
         "notes": "Synthetic-free public metadata record; no PDF downloaded.",
     }
-    return {field: str(record.get(field, "")) for field in CANDIDATE_FIELDS}
+    return enrich_candidate_record(record)
 
 
 def fetch_openalex(query: str, per_page: int = 25, mailto: str | None = None) -> list[dict]:
@@ -346,7 +433,7 @@ def write_candidate_csv(path: str | Path, records: Iterable[dict[str, str]]) -> 
         writer = csv.DictWriter(handle, fieldnames=CANDIDATE_FIELDS)
         writer.writeheader()
         for record in records:
-            writer.writerow({field: record.get(field, "") for field in CANDIDATE_FIELDS})
+            writer.writerow(enrich_candidate_record(record))
     return output
 
 
@@ -354,7 +441,7 @@ def read_candidate_csv(path: str | Path) -> list[dict[str, str]]:
     """Read candidate CSV records."""
 
     with Path(path).open(newline="", encoding="utf-8") as handle:
-        return list(csv.DictReader(handle))
+        return [enrich_candidate_record(record) for record in csv.DictReader(handle)]
 
 
 def dedup_key(record: dict[str, str]) -> str:
@@ -371,9 +458,10 @@ def deduplicate_candidates(records: Iterable[dict[str, str]]) -> list[dict[str, 
 
     merged: dict[str, dict[str, str]] = {}
     for record in records:
+        record = enrich_candidate_record(record)
         key = dedup_key(record)
         if key not in merged:
-            merged[key] = {field: record.get(field, "") for field in CANDIDATE_FIELDS}
+            merged[key] = record
             continue
         existing = merged[key]
         for field in ["query_used", "source_api"]:
@@ -382,6 +470,17 @@ def deduplicate_candidates(records: Iterable[dict[str, str]]) -> list[dict[str, 
         for field in CANDIDATE_FIELDS:
             if not existing.get(field) and record.get(field):
                 existing[field] = record[field]
+        existing["relevance_score"] = str(
+            max(float(existing.get("relevance_score") or 0), float(record.get("relevance_score") or 0))
+        )
+        existing["exclusion_hint"] = "; ".join(
+            dict.fromkeys(
+                part.strip()
+                for value in [existing.get("exclusion_hint", ""), record.get("exclusion_hint", "")]
+                for part in value.split(";")
+                if part.strip()
+            )
+        )
     return list(merged.values())
 
 
@@ -443,7 +542,9 @@ def summarize_candidates(records: list[dict[str, str]]) -> dict:
     llzo_like = 0
     doi_count = 0
     abstract_count = 0
+    relevance_counts = {"high": 0, "medium": 0, "low": 0, "likely_irrelevant": 0}
     for record in records:
+        record = enrich_candidate_record(record)
         material = record.get("material_family_guess") or "unknown"
         material_counts[material] = material_counts.get(material, 0) + 1
         tags = record.get("topic_tags", "").lower()
@@ -453,10 +554,26 @@ def summarize_candidates(records: list[dict[str, str]]) -> dict:
             doi_count += 1
         if record.get("abstract", "").strip():
             abstract_count += 1
+        score = float(record.get("relevance_score") or 0)
+        hint = record.get("exclusion_hint", "")
+        if any(flag in hint for flag in ["polymer_only", "liquid_electrolyte_only", "electrode_only"]):
+            relevance_counts["likely_irrelevant"] += 1
+        elif score >= 0.75:
+            relevance_counts["high"] += 1
+        elif score >= 0.45:
+            relevance_counts["medium"] += 1
+        elif score >= 0.2:
+            relevance_counts["low"] += 1
+        else:
+            relevance_counts["likely_irrelevant"] += 1
     return {
         "candidate_count": total,
         "llzo_llzto_garnet_ratio": round(llzo_like / total, 4) if total else 0,
         "doi_coverage": round(doi_count / total, 4) if total else 0,
         "abstract_coverage": round(abstract_count / total, 4) if total else 0,
+        "high_relevance_count": relevance_counts["high"],
+        "medium_relevance_count": relevance_counts["medium"],
+        "low_relevance_count": relevance_counts["low"],
+        "likely_irrelevant_count": relevance_counts["likely_irrelevant"],
         "material_family_distribution": dict(sorted(material_counts.items())),
     }
