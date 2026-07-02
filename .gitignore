@@ -4,6 +4,7 @@ __pycache__/
 .pytest_cache/
 .env
 .venv/
+work/
 data/private/
 data/raw/*
 !data/raw/README.md
