@@ -18,9 +18,13 @@ Each candidate record uses the following schema:
 
 `screening_status` starts as `unreviewed`. Reviewers later fill `screening_decision`, `screening_reason`, and `notes`.
 
-## Batch 1 Scope
+## Batch Scope
 
-Batch 1 targets LLZO/LLZTO garnet electrolyte doping and battery-performance-linked studies. The initial queries are:
+### Batch 1: LLZO/LLZTO Pilot Discovery
+
+Target: 100 raw candidates.
+
+Batch 1 targets LLZO/LLZTO garnet electrolyte doping and battery-performance-linked studies. The queries are:
 
 - LLZO doped ionic conductivity
 - LLZTO garnet electrolyte doping
@@ -33,12 +37,58 @@ Batch 1 targets LLZO/LLZTO garnet electrolyte doping and battery-performance-lin
 - co-doped LLZO garnet solid electrolyte
 - garnet solid electrolyte lithium symmetric cell
 
+### Batch 2: Garnet Expansion
+
+Target: 400 raw candidates.
+
+Batch 2 expands within garnet-type solid electrolytes across composition, processing, transport, interface, and battery-performance topics. The queries are:
+
+- garnet-type solid electrolyte dopant
+- Li7La3Zr2O12 doping
+- garnet electrolyte co-doping
+- LLZO grain boundary conductivity dopant
+- LLZO activation energy doped
+- LLZO critical current density doped
+- LLZO lithium metal interface doped
+- LLZO full cell doped solid electrolyte
+- garnet solid electrolyte processing density conductivity
+- garnet electrolyte sintering dopant conductivity
+
+### Batch 3: External Validation Families
+
+Target: 500 raw candidates.
+
+Batch 3 expands beyond garnet materials to NASICON, sulfide, halide, and broader data-driven solid electrolyte discovery. This batch is intended for external validation and transferability checks. The queries are:
+
+- NASICON solid electrolyte doping ionic conductivity
+- LATP doping solid electrolyte conductivity
+- LAGP doping solid electrolyte conductivity
+- sulfide solid electrolyte doping lithium conductivity
+- argyrodite solid electrolyte doping
+- halide solid electrolyte doping lithium battery
+- solid electrolyte dopant battery performance
+- solid electrolyte ionic conductivity lithium symmetric cell
+- solid electrolyte critical current density doping
+- data driven solid electrolyte discovery doping
+
+## Running Batches
+
+Batch 1 has been used as the initial demonstration run. Batch 2 and Batch 3 are configured but should be run later when the reviewer is ready to screen larger candidate pools.
+
 Run:
 
 ```bash
 python scripts/search_literature_batch.py --batch 1 --target 100
 python scripts/deduplicate_literature.py
 python scripts/summarize_literature_pool.py
+```
+
+Default targets are also available:
+
+```bash
+python scripts/search_literature_batch.py --batch 1
+python scripts/search_literature_batch.py --batch 2
+python scripts/search_literature_batch.py --batch 3
 ```
 
 ## Deduplication

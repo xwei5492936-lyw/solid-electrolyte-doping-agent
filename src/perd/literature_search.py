@@ -31,8 +31,34 @@ BATCH_QUERIES: dict[int, list[str]] = {
         "Sr doped LLZO",
         "co-doped LLZO garnet solid electrolyte",
         "garnet solid electrolyte lithium symmetric cell",
-    ]
+    ],
+    2: [
+        "garnet-type solid electrolyte dopant",
+        "Li7La3Zr2O12 doping",
+        "garnet electrolyte co-doping",
+        "LLZO grain boundary conductivity dopant",
+        "LLZO activation energy doped",
+        "LLZO critical current density doped",
+        "LLZO lithium metal interface doped",
+        "LLZO full cell doped solid electrolyte",
+        "garnet solid electrolyte processing density conductivity",
+        "garnet electrolyte sintering dopant conductivity",
+    ],
+    3: [
+        "NASICON solid electrolyte doping ionic conductivity",
+        "LATP doping solid electrolyte conductivity",
+        "LAGP doping solid electrolyte conductivity",
+        "sulfide solid electrolyte doping lithium conductivity",
+        "argyrodite solid electrolyte doping",
+        "halide solid electrolyte doping lithium battery",
+        "solid electrolyte dopant battery performance",
+        "solid electrolyte ionic conductivity lithium symmetric cell",
+        "solid electrolyte critical current density doping",
+        "data driven solid electrolyte discovery doping",
+    ],
 }
+
+BATCH_TARGETS: dict[int, int] = {1: 100, 2: 400, 3: 500}
 
 CANDIDATE_FIELDS = [
     "candidate_id",

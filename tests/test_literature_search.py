@@ -1,4 +1,6 @@
 from perd.literature_search import (
+    BATCH_QUERIES,
+    BATCH_TARGETS,
     CANDIDATE_FIELDS,
     candidate_from_crossref_item,
     candidate_from_openalex_work,
@@ -10,6 +12,14 @@ from perd.literature_search import (
     reconstruct_openalex_abstract,
     summarize_candidates,
 )
+
+
+def test_batch_queries_support_batches_1_2_3():
+    assert sorted(BATCH_QUERIES) == [1, 2, 3]
+    assert BATCH_TARGETS == {1: 100, 2: 400, 3: 500}
+    assert all(len(BATCH_QUERIES[batch]) == 10 for batch in [1, 2, 3])
+    assert "garnet-type solid electrolyte dopant" in BATCH_QUERIES[2]
+    assert "NASICON solid electrolyte doping ionic conductivity" in BATCH_QUERIES[3]
 
 
 def test_normalize_title_removes_case_and_punctuation():
