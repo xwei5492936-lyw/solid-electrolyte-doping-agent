@@ -1,0 +1,2 @@
+{"conductivity_s_cm": null, "dopant": "Al", "dopant_fraction": 0.2, "evidence_type": "experimental_fact", "material": "LLZO", "notes": "Placeholder seed record; replace with verified literature metadata.", "site": "Li", "source_id": "seed-al-llzo", "synthesis_route": "solid-state"}
+{"conductivity_s_cm": null, "dopant": "Ta", "dopant_fraction": 0.4, "evidence_type": "experimental_fact", "material": "LLZTO", "notes": "Placeholder seed record; replace with verified literature metadata.", "site": "Zr", "source_id": "seed-ta-llzto", "synthesis_route": "solid-state"}
