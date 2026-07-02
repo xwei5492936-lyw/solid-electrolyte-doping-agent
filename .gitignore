@@ -10,6 +10,7 @@ data/raw/*
 !data/raw/README.md
 data/interim/*
 !data/interim/README.md
+data/processed/literature_candidates_*.csv
 outputs/figures/*
 !outputs/figures/.gitkeep
 outputs/models/*
