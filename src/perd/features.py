@@ -8,6 +8,33 @@ import warnings
 import pandas as pd
 
 
+BATTERY_OUTCOME_FIELDS = {
+    "li_symmetric_lifetime_h",
+    "critical_current_density_ma_cm2",
+    "capacity_retention_percent",
+    "capacity_mah_g",
+    "coulombic_efficiency_percent",
+}
+
+LABEL_LEAKAGE_FIELDS = {
+    "long_lifetime": {"li_symmetric_lifetime_h"},
+    "high_ccd": {"critical_current_density_ma_cm2"},
+    "full_cell_stable": {"capacity_retention_percent", "cycle_number", "capacity_mah_g"},
+    "high_conductivity": {"total_conductivity_25c_s_cm", "log10_total_conductivity_25c_s_cm"},
+    "very_high_conductivity": {"total_conductivity_25c_s_cm", "log10_total_conductivity_25c_s_cm"},
+}
+
+PREDICTIVE_FEATURE_SETS = {
+    "composition_only",
+    "descriptor_only",
+    "processing_aware",
+    "structure_transport_aware",
+    "perd_predictive",
+}
+
+ANALYSIS_FEATURE_SETS = {"full_chain_analysis"}
+
+
 def safe_log10(value) -> float | None:
     try:
         numeric = float(value)
@@ -51,6 +78,10 @@ def create_high_ccd_label(df: pd.DataFrame, threshold: float = 0.5) -> pd.DataFr
     return _label(df, "critical_current_density_ma_cm2", threshold, "high_ccd")
 
 
+def create_full_cell_stable_label(df: pd.DataFrame, threshold: float = 80) -> pd.DataFrame:
+    return _label(df, "capacity_retention_percent", threshold, "full_cell_stable")
+
+
 def create_co_doping_flag(df: pd.DataFrame) -> pd.DataFrame:
     output = df.copy()
     if "co_doping_flag" in output.columns:
@@ -75,16 +106,54 @@ def estimate_valence_difference(df: pd.DataFrame) -> pd.DataFrame:
     return output
 
 
-def build_feature_matrix(df: pd.DataFrame, feature_set: str):
-    """Build feature matrix for a named PERD feature set."""
-
-    output = log_transform_conductivity(create_co_doping_flag(estimate_valence_difference(df.copy())))
+def _feature_definitions() -> tuple[dict[str, list[str]], dict[str, list[str]]]:
     numeric_by_set = {
-        "composition_only": ["dopant_concentration_1", "dopant_concentration_2", "li_content", "co_doping_flag_numeric", "estimated_valence_difference"],
-        "descriptor_only": ["dopant_concentration_1", "dopant_concentration_2", "li_content", "estimated_valence_difference"],
-        "processing_aware": ["dopant_concentration_1", "dopant_concentration_2", "li_content", "relative_density_percent", "sintering_temperature_c", "sintering_time_h"],
-        "transport_aware": ["dopant_concentration_1", "log10_total_conductivity_25c_s_cm", "log10_gb_conductivity_25c_s_cm", "activation_energy_ev"],
-        "full_perd": [
+        "composition_only": [
+            "dopant_concentration_1",
+            "dopant_concentration_2",
+            "li_content",
+            "co_doping_flag_numeric",
+            "estimated_valence_difference",
+        ],
+        "descriptor_only": [
+            "dopant_concentration_1",
+            "dopant_concentration_2",
+            "li_content",
+            "estimated_valence_difference",
+        ],
+        "processing_aware": [
+            "dopant_concentration_1",
+            "dopant_concentration_2",
+            "li_content",
+            "relative_density_percent",
+            "sintering_temperature_c",
+            "sintering_time_h",
+        ],
+        "structure_transport_aware": [
+            "dopant_concentration_1",
+            "dopant_concentration_2",
+            "li_content",
+            "relative_density_percent",
+            "sintering_temperature_c",
+            "log10_total_conductivity_25c_s_cm",
+            "log10_gb_conductivity_25c_s_cm",
+            "activation_energy_ev",
+        ],
+        "perd_predictive": [
+            "dopant_concentration_1",
+            "dopant_concentration_2",
+            "li_content",
+            "co_doping_flag_numeric",
+            "estimated_valence_difference",
+            "relative_density_percent",
+            "sintering_temperature_c",
+            "sintering_time_h",
+            "log10_total_conductivity_25c_s_cm",
+            "log10_gb_conductivity_25c_s_cm",
+            "activation_energy_ev",
+            "interfacial_resistance_ohm_cm2",
+        ],
+        "full_chain_analysis": [
             "dopant_concentration_1",
             "dopant_concentration_2",
             "li_content",
@@ -99,18 +168,72 @@ def build_feature_matrix(df: pd.DataFrame, feature_set: str):
             "interfacial_resistance_ohm_cm2",
             "critical_current_density_ma_cm2",
             "li_symmetric_lifetime_h",
+            "cycle_number",
+            "capacity_mah_g",
             "capacity_retention_percent",
+            "coulombic_efficiency_percent",
         ],
     }
     categorical_by_set = {
         "composition_only": ["material_family", "dopant_element_1", "dopant_site_1"],
         "descriptor_only": ["material_family", "dopant_element_1", "dopant_site_1", "charge_compensation_type"],
         "processing_aware": ["material_family", "dopant_element_1", "synthesis_method", "atmosphere", "phase"],
-        "transport_aware": ["material_family", "dopant_element_1", "phase"],
-        "full_perd": ["material_family", "dopant_element_1", "dopant_site_1", "synthesis_method", "atmosphere", "phase", "cathode_type"],
+        "structure_transport_aware": ["material_family", "dopant_element_1", "phase"],
+        "perd_predictive": [
+            "material_family",
+            "dopant_element_1",
+            "dopant_site_1",
+            "synthesis_method",
+            "atmosphere",
+            "phase",
+            "li_contact_method",
+            "cathode_type",
+        ],
+        "full_chain_analysis": [
+            "material_family",
+            "dopant_element_1",
+            "dopant_site_1",
+            "synthesis_method",
+            "atmosphere",
+            "phase",
+            "li_contact_method",
+            "cathode_type",
+        ],
     }
+    return numeric_by_set, categorical_by_set
+
+
+def _check_for_leakage(feature_set: str, selected_columns: set[str], label_column: str | None) -> None:
+    if feature_set in PREDICTIVE_FEATURE_SETS:
+        leaked_outcomes = selected_columns & BATTERY_OUTCOME_FIELDS
+        if leaked_outcomes:
+            raise ValueError(
+                f"Predictive feature_set '{feature_set}' includes battery outcome fields: "
+                f"{sorted(leaked_outcomes)}"
+            )
+    if label_column:
+        direct_leakage = selected_columns & LABEL_LEAKAGE_FIELDS.get(label_column, set())
+        if direct_leakage:
+            raise ValueError(
+                f"feature_set '{feature_set}' leaks target '{label_column}' through fields: "
+                f"{sorted(direct_leakage)}"
+            )
+    if feature_set in ANALYSIS_FEATURE_SETS and label_column:
+        raise ValueError(
+            f"feature_set '{feature_set}' is for correlation, visualization, and rule discovery only; "
+            "do not use it for supervised prediction."
+        )
+
+
+def build_feature_matrix(df: pd.DataFrame, feature_set: str, label_column: str | None = None):
+    """Build feature matrix for a named PERD feature set."""
+
+    output = log_transform_conductivity(create_co_doping_flag(estimate_valence_difference(df.copy())))
+    numeric_by_set, categorical_by_set = _feature_definitions()
     if feature_set not in numeric_by_set:
         raise ValueError(f"Unsupported feature_set: {feature_set}")
+    selected_columns = set(numeric_by_set[feature_set]) | set(categorical_by_set[feature_set])
+    _check_for_leakage(feature_set, selected_columns, label_column)
 
     feature_parts: list[pd.DataFrame] = []
     for column in numeric_by_set[feature_set]:

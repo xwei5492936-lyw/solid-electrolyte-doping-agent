@@ -21,7 +21,11 @@ def main() -> None:
         return
     df = create_high_conductivity_label(create_long_lifetime_label(pd.read_csv(input_path)))
     label = "long_lifetime" if df["long_lifetime"].nunique() > 1 else "high_conductivity"
-    results = compare_models_temporal(df, ["composition_only", "processing_aware", "transport_aware", "full_perd"], label)
+    results = compare_models_temporal(
+        df,
+        ["composition_only", "processing_aware", "structure_transport_aware", "perd_predictive"],
+        label,
+    )
     write_json(output_path, results)
     print(f"Wrote {output_path}")
 

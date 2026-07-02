@@ -30,9 +30,25 @@ BPRS =
 
 All sub-scores are constrained to 0-1.
 
+## Predictive and Analysis Feature Modes
+
+PERD separates predictive feature sets from full-chain analysis features.
+
+Predictive feature sets are used for supervised models:
+
+- `composition_only`
+- `descriptor_only`
+- `processing_aware`
+- `structure_transport_aware`
+- `perd_predictive`
+
+These modes must not use battery outcome fields that are only known after cell testing, including `li_symmetric_lifetime_h`, `critical_current_density_ma_cm2`, `capacity_retention_percent`, `capacity_mah_g`, and `coulombic_efficiency_percent`. If the label is derived from one of these outcomes, feeding that same outcome back as an input would create data leakage and overstate model performance.
+
+`full_chain_analysis` is reserved for correlation analysis, visualization, and rule discovery across composition, processing, transport, interface, and battery performance. It is not used to train supervised models for labels that are directly derived from the same downstream outcome fields.
+
 ## Baseline Comparison
 
-Baselines include conductivity-only ranking, composition-only models, descriptor-only models, processing-aware models, and full PERD models.
+Baselines include conductivity-only ranking, composition-only models, descriptor-only models, processing-aware models, structure/transport-aware models, and PERD predictive models.
 
 ## Temporal Validation
 

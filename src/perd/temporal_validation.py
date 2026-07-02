@@ -38,8 +38,11 @@ def run_temporal_validation(
     y_test = pd.to_numeric(test[label_column], errors="coerce").fillna(0).astype(int)
     if y_train.nunique() < 2:
         return {"status": "skipped", "message": "Training period needs at least two classes.", "feature_set": feature_set}
-    X_train, feature_names = build_feature_matrix(train, feature_set)
-    X_test, _ = build_feature_matrix(test, feature_set)
+    try:
+        X_train, feature_names = build_feature_matrix(train, feature_set, label_column=label_column)
+        X_test, _ = build_feature_matrix(test, feature_set, label_column=label_column)
+    except ValueError as exc:
+        return {"status": "skipped", "message": str(exc), "feature_set": feature_set}
     X_test = X_test.reindex(columns=feature_names, fill_value=0)
     model = train_random_forest_classifier(X_train, y_train)
     metrics = evaluate_classifier(model, X_test, y_test)

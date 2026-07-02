@@ -65,7 +65,10 @@ def _fit_and_eval(df: pd.DataFrame, label_column: str, feature_set: str, model_n
     y = pd.to_numeric(df[label_column], errors="coerce").fillna(0).astype(int)
     if y.nunique() < 2:
         return _friendly("Need at least two label classes for classifier training.")
-    X, feature_names = build_feature_matrix(df, feature_set)
+    try:
+        X, feature_names = build_feature_matrix(df, feature_set, label_column=label_column)
+    except ValueError as exc:
+        return _friendly(str(exc))
     stratify = y if y.value_counts().min() >= 2 else None
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=stratify)
     if model_name == "random_forest":
@@ -88,7 +91,7 @@ def compare_baseline_models(df: pd.DataFrame, label_column: str) -> dict:
         results["conductivity_only_ranking"] = {"top_k_hit_rate": top_k_hit_rate(y, scores, k=min(10, len(df)))}
     else:
         results["conductivity_only_ranking"] = _friendly("Missing total_conductivity_25c_s_cm.")
-    for feature_set in ["composition_only", "descriptor_only", "processing_aware", "full_perd"]:
+    for feature_set in ["composition_only", "descriptor_only", "processing_aware", "structure_transport_aware", "perd_predictive"]:
         results[feature_set] = _fit_and_eval(df, label_column, feature_set, "random_forest")
     Path("outputs/reports").mkdir(parents=True, exist_ok=True)
     Path("outputs/reports/baseline_metrics.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
