@@ -31,6 +31,11 @@ data/processed/          Example/generated structured data.
 docs/                    Research plans and algorithm notes.
 ```
 
+## Documentation
+
+- [PERD research track](docs/PERD.md)
+- [Research roadmap and Codex workflow](docs/ROADMAP.md)
+
 ## Quick Start
 
 ```bash
