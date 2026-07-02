@@ -1,0 +1,2 @@
+sample_id,total_conductivity_25c_s_cm,bulk_conductivity_25c_s_cm,gb_conductivity_25c_s_cm,activation_energy_ev,electronic_conductivity_s_cm,eis_temperature_range,drt_available,confidence
+synthetic-sample-001,0.001,0.002,0.0005,0.32,0.00000001,25-80 C,false,medium

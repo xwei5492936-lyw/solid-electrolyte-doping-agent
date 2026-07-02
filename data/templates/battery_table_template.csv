@@ -1,0 +1,2 @@
+sample_id,cathode_type,cathode_loading_mg_cm2,liquid_electrolyte_amount_ul,cycling_rate,cycle_number,capacity_mah_g,capacity_retention_percent,coulombic_efficiency_percent,operating_temperature_c,confidence
+synthetic-sample-001,NCM,2.0,0,C/10,100,150,82,99.2,25,medium

@@ -1,54 +1,115 @@
-# Solid Electrolyte Doping Agent
+# PERD: Performance-aware Electrolyte Rule Discovery
 
-A research prototype for literature-mined and physics-constrained dopant recommendation in solid-state electrolytes, starting from LLZO/LLZTO.
+## Project Overview
 
-## Research Tracks
+PERD is a research software framework for discovering performance-relevant dopant rules in solid-state electrolytes. It builds a data chain from `composition -> processing -> structure/transport -> interface -> battery performance`, rather than optimizing ionic conductivity alone.
 
-### Track 1: LLZO Doping Database and Candidate Recommendation
+This repository implements the non-experimental part of the project: data templates, validation, feature engineering, baseline models, rule-based PERD/BPRS scoring, temporal extrapolation validation, candidate ranking, visualization scripts, tests, and documentation.
 
-Build a structured literature database for LLZO/LLZTO dopants, distinguish experimental facts from model predictions, and generate physics-constrained candidate dopant schemes.
+## Scientific Motivation
 
-### Track 2: PERD
+Solid-state electrolyte dopant studies often focus on conductivity, but real battery performance also depends on processing quality, phase stability, grain-boundary behavior, Li interface behavior, cathode pairing, cycling conditions, and evidence quality. PERD is designed to compare performance-aware rule discovery against narrower composition-only and conductivity-only baselines.
 
-PERD, short for Performance-aware Electrolyte Rule Discovery, is a second research track for discovering solid-state electrolyte doping rules that are aware of real battery performance.
-
-The central hypothesis is that dopant rules discovered from composition, processing, transport, interface, and cell-performance features should predict practical battery performance better than traditional composition-only or conductivity-only models.
-
-## Goals
-1. Extract dopant cases from literature.
-2. Build a structured LLZO doping database.
-3. Distinguish experimental facts from model predictions.
-4. Generate physics-constrained candidate dopant schemes.
-5. Train interpretable ML models for ranking candidates.
-
-## Project Structure
+## Repository Structure
 
 ```text
-src/llzo_doping_agent/   Core data models, constraints, and storage helpers.
-scripts/                 Command-line utilities for database initialization.
-tests/                   Pytest test suite.
-data/processed/          Example/generated structured data.
-docs/                    Research plans and algorithm notes.
+data/       Raw, interim, processed, and template data tables.
+src/perd/   Schema, validation, feature, scoring, model, temporal, and plotting modules.
+scripts/    Reproducible command-line pipeline stages.
+notebooks/  Optional exploratory notebooks.
+outputs/    Generated figures, models, reports, and tables.
+tests/      Pytest coverage for core behavior.
+docs/       Database, extraction, algorithm, experiment, and paper notes.
 ```
 
-## Documentation
+## Data Templates
 
-- [PERD research track](docs/PERD.md)
-- [Research roadmap and Codex workflow](docs/ROADMAP.md)
+Templates live in `data/templates/`:
 
-## Quick Start
+- `literature_extraction_template.csv`
+- `composition_table_template.csv`
+- `processing_table_template.csv`
+- `transport_table_template.csv`
+- `interface_table_template.csv`
+- `battery_table_template.csv`
+
+Each template contains one synthetic / fictitious example row. Replace those rows with manually verified literature data. Use `unknown` for missing values and keep `confidence` limited to `high`, `medium`, `low`, or `unknown`.
+
+## Installation
 
 ```bash
 python -m pip install -r requirements.txt
-python scripts/init_database.py
+```
+
+## How To Run Tests
+
+```bash
 python -m pytest
 ```
 
-## Data Model
+## How To Build Master Dataset
 
-The initial database schema separates experimental facts from model predictions:
+Fill CSV files under `data/interim/` or `data/processed/` with these names: `literature.csv`, `composition.csv`, `processing.csv`, `transport.csv`, `interface.csv`, and `battery.csv`.
 
-- `DopantCase`: a literature-mined experimental record for an LLZO/LLZTO dopant.
-- `CandidateScheme`: a model-generated dopant proposal with explicit constraint status.
+```bash
+python scripts/build_master_dataset.py
+```
 
-The first implemented constraints check common LLZO design rules: known substitution site, positive dopant fraction, and charge-balancing valence difference.
+## How To Validate Dataset
+
+```bash
+python scripts/validate_dataset.py
+```
+
+The report is written to `outputs/reports/validation_report.json`.
+
+## How To Train Baseline Models
+
+```bash
+python scripts/train_baselines.py
+```
+
+The script creates labels when possible, compares conductivity-only ranking and feature-set baselines, writes metrics to `outputs/reports/baseline_metrics.json`, and saves models under `outputs/models/`.
+
+## How To Run PERD/BPRS Scoring
+
+```bash
+python scripts/run_perd_scoring.py
+```
+
+Ranked candidates are written to `outputs/tables/ranked_candidates.csv`.
+
+## How To Run Temporal Validation
+
+```bash
+python scripts/run_temporal_validation.py
+```
+
+Results are written to `outputs/reports/temporal_validation_results.json`.
+
+## How To Generate Figures
+
+```bash
+python scripts/generate_figures.py
+```
+
+Available figures are written to `outputs/figures/`. Missing fields are skipped with a report rather than causing a hard crash.
+
+## Manual Data Required
+
+The repository does not contain real literature data. The user must manually provide and verify:
+
+- Literature metadata: DOI, title, year, journal, source type.
+- Composition data: formula, dopant elements, sites, valence, concentration, Li content.
+- Processing data: synthesis method, calcination, sintering, atmosphere, density, phase.
+- Transport data: total/bulk/grain-boundary conductivity, activation energy, EIS details.
+- Interface data: Li contact, interfacial resistance, CCD, Li symmetric-cell conditions.
+- Battery data: cathode, loading, rate, cycle number, capacity, retention, efficiency.
+
+## Limitations And No-Overclaim Statement
+
+This repository contains no real literature database by default. Real data must be manually filled, checked, and versioned.
+
+Current BPRS is a first-version rule-based scoring algorithm. Its weights are transparent starting assumptions, not learned scientific truth. Later versions can learn weights from verified real data.
+
+Without a real database, baseline comparison, temporal validation, and external experimental validation, this project cannot claim that PERD/BPRS outperforms existing methods.

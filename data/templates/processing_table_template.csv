@@ -1,0 +1,2 @@
+sample_id,synthesis_method,calcination_temperature_c,calcination_time_h,sintering_temperature_c,sintering_time_h,atmosphere,excess_lithium_source,mother_powder,relative_density_percent,grain_size_um,phase,lattice_parameter_a,secondary_phase,confidence
+synthetic-sample-001,solid-state,900,6,1150,12,air,Li2CO3,unknown,92,5,cubic,12.98,unknown,medium
