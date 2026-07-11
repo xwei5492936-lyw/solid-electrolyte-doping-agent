@@ -1,2 +1,2 @@
-sample_id,li_contact_method,interfacial_resistance_ohm_cm2,critical_current_density_ma_cm2,li_symmetric_current_density_ma_cm2,li_symmetric_areal_capacity_mah_cm2,li_symmetric_lifetime_h,cycling_temperature_c,stack_pressure_mpa,confidence
-synthetic-sample-001,polished pellet contact,80,0.6,0.1,0.1,600,25,5,medium
+sample_id,li_contact_method,interfacial_resistance_ohm_cm2,critical_current_density_ma_cm2,li_symmetric_current_density_ma_cm2,li_symmetric_areal_capacity_mah_cm2,li_symmetric_lifetime_h,cycling_temperature_c,stack_pressure_mpa,confidence,lifetime_evidence,ccd_evidence,interfacial_resistance_evidence
+synthetic-sample-001,polished pellet contact,80,0.6,0.1,0.1,600,25,5,medium,,,

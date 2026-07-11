@@ -33,6 +33,10 @@ COMPOSITION_FIELDS = (
     "li_content",
     "charge_compensation_type",
     "confidence",
+    "formula_evidence",
+    "dopant_evidence",
+    "dopant_site_evidence",
+    "concentration_evidence",
 )
 
 PROCESSING_FIELDS = (
@@ -51,6 +55,9 @@ PROCESSING_FIELDS = (
     "lattice_parameter_a",
     "secondary_phase",
     "confidence",
+    "sintering_temperature_evidence",
+    "sintering_time_evidence",
+    "atmosphere_evidence",
 )
 
 TRANSPORT_FIELDS = (
@@ -63,6 +70,10 @@ TRANSPORT_FIELDS = (
     "eis_temperature_range",
     "drt_available",
     "confidence",
+    "conductivity_evidence",
+    "activation_energy_evidence",
+    "bulk_conductivity_evidence",
+    "grain_boundary_conductivity_evidence",
 )
 
 INTERFACE_FIELDS = (
@@ -76,6 +87,9 @@ INTERFACE_FIELDS = (
     "cycling_temperature_c",
     "stack_pressure_mpa",
     "confidence",
+    "lifetime_evidence",
+    "ccd_evidence",
+    "interfacial_resistance_evidence",
 )
 
 BATTERY_FIELDS = (
@@ -90,7 +104,77 @@ BATTERY_FIELDS = (
     "coulombic_efficiency_percent",
     "operating_temperature_c",
     "confidence",
+    "cycle_number_evidence",
+    "capacity_retention_evidence",
 )
+
+EVIDENCE_FIELD_MAP = {
+    "composition": {
+        "formula": {"value_fields": ("base_formula", "final_formula"), "evidence_field": "formula_evidence"},
+        "dopant": {
+            "value_fields": ("dopant_element_1", "dopant_element_2"),
+            "evidence_field": "dopant_evidence",
+        },
+        "dopant_site": {
+            "value_fields": ("dopant_site_1", "dopant_site_2"),
+            "evidence_field": "dopant_site_evidence",
+        },
+        "concentration": {
+            "value_fields": ("dopant_concentration_1", "dopant_concentration_2"),
+            "evidence_field": "concentration_evidence",
+        },
+    },
+    "processing": {
+        "sintering_temperature": {
+            "value_fields": ("sintering_temperature_c",),
+            "evidence_field": "sintering_temperature_evidence",
+        },
+        "sintering_time": {
+            "value_fields": ("sintering_time_h",),
+            "evidence_field": "sintering_time_evidence",
+        },
+        "atmosphere": {"value_fields": ("atmosphere",), "evidence_field": "atmosphere_evidence"},
+    },
+    "transport": {
+        "conductivity": {
+            "value_fields": ("total_conductivity_25c_s_cm",),
+            "evidence_field": "conductivity_evidence",
+        },
+        "activation_energy": {
+            "value_fields": ("activation_energy_ev",),
+            "evidence_field": "activation_energy_evidence",
+        },
+        "bulk_conductivity": {
+            "value_fields": ("bulk_conductivity_25c_s_cm",),
+            "evidence_field": "bulk_conductivity_evidence",
+        },
+        "grain_boundary_conductivity": {
+            "value_fields": ("gb_conductivity_25c_s_cm",),
+            "evidence_field": "grain_boundary_conductivity_evidence",
+        },
+    },
+    "interface": {
+        "lifetime": {
+            "value_fields": ("li_symmetric_lifetime_h",),
+            "evidence_field": "lifetime_evidence",
+        },
+        "CCD": {
+            "value_fields": ("critical_current_density_ma_cm2",),
+            "evidence_field": "ccd_evidence",
+        },
+        "interfacial_resistance": {
+            "value_fields": ("interfacial_resistance_ohm_cm2",),
+            "evidence_field": "interfacial_resistance_evidence",
+        },
+    },
+    "battery": {
+        "cycle_number": {"value_fields": ("cycle_number",), "evidence_field": "cycle_number_evidence"},
+        "capacity_retention": {
+            "value_fields": ("capacity_retention_percent",),
+            "evidence_field": "capacity_retention_evidence",
+        },
+    },
+}
 
 MASTER_REQUIRED_FIELDS = (
     "sample_id",
@@ -125,3 +209,12 @@ def get_all_schema_fields() -> dict[str, tuple[str, ...]]:
     """Return all known table schemas."""
 
     return dict(_SCHEMAS)
+
+
+def get_evidence_schema(table_name: str) -> dict[str, dict[str, tuple[str, ...] | str]]:
+    """Return evidence-enabled concepts and their value/evidence columns."""
+
+    key = table_name.lower()
+    if key not in EVIDENCE_FIELD_MAP:
+        raise ValueError(f"Unsupported evidence table_name: {table_name}")
+    return dict(EVIDENCE_FIELD_MAP[key])

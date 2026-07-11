@@ -1,2 +1,2 @@
-sample_id,paper_id,base_formula,final_formula,material_family,dopant_element_1,dopant_site_1,dopant_valence_1,dopant_concentration_1,dopant_element_2,dopant_site_2,dopant_valence_2,dopant_concentration_2,co_doping_flag,li_content,charge_compensation_type,confidence
-synthetic-sample-001,synthetic-paper-001,Li7La3Zr2O12,Li6.5La3Zr1.5Ta0.5O12,garnet,Ta,Zr,5,0.5,unknown,unknown,,0,false,6.5,aliovalent substitution,medium
+sample_id,paper_id,base_formula,final_formula,material_family,dopant_element_1,dopant_site_1,dopant_valence_1,dopant_concentration_1,dopant_element_2,dopant_site_2,dopant_valence_2,dopant_concentration_2,co_doping_flag,li_content,charge_compensation_type,confidence,formula_evidence,dopant_evidence,dopant_site_evidence,concentration_evidence
+synthetic-sample-001,synthetic-paper-001,Li7La3Zr2O12,Li6.5La3Zr1.5Ta0.5O12,garnet,Ta,Zr,5,0.5,unknown,unknown,,0,false,6.5,aliovalent substitution,medium,,,,
