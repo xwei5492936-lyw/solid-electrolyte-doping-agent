@@ -8,6 +8,10 @@ work/
 data/private/
 data/raw/*
 !data/raw/README.md
+data/raw/pdf/
+data/raw/extraction_json/
+data/review/human_validation/*
+!data/review/human_validation/README.md
 data/interim/*
 !data/interim/README.md
 data/processed/literature_candidates_*.csv

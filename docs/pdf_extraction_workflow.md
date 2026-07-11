@@ -106,3 +106,9 @@ Database inclusion is a separate, explicit curation step. Only reviewed records 
 - Transport: total, bulk, and grain-boundary conductivity; activation energy.
 - Interface: interfacial resistance, critical current density, and Li symmetric-cell lifetime.
 - Battery: capacity retention and cycle number.
+
+## Three-Paper Pilot
+
+Phase 2 is prepared with `python scripts/prepare_pdf_extraction_pilot.py`. The script selects only priorities 1-3 from `outputs/tables/pdf_extraction_pilot10.csv`, joins the verified access registry, checks local PDF and extraction JSON files, and writes the pilot table and report.
+
+PDF files under `data/raw/pdf/`, extraction JSON under `data/raw/extraction_json/`, and completed human review files under `data/review/human_validation/` are ignored by Git. The access registry and blank review template contain no extracted scientific claims and remain tracked for reproducibility.
