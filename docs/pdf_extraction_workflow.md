@@ -29,9 +29,11 @@ Separate database inclusion decision
 
 Acquire a paper through an open-access source or an authorized personal/institutional route. Keep the PDF local and outside version control. PDF acquisition is separate from PERD extraction.
 
-### 2. Text or Markdown Preparation
+### 2. PDF, Text, or Markdown Input
 
-Convert the PDF to text or Markdown while preserving page labels. Recommended page markers include `[Page 5]` or `<!-- page: 5 -->`. Tables and figure captions should remain close to their page marker. OCR output must be labeled through `extraction_method` when it supplies evidence.
+The pipeline accepts a local PDF path, direct extracted text/Markdown, or a local `.md`, `.markdown`, or `.txt` path. Local PDF input is parsed with `pypdf` and converted into page-marked text such as `[Page 5]`. The module never downloads a PDF. Scanned PDFs with no extractable text are rejected with an OCR-required error instead of producing unsupported evidence.
+
+For externally prepared Markdown, preserve page markers such as `[Page 5]` or `<!-- page: 5 -->`. Tables and figure captions should remain close to their page marker. OCR output must be labeled through `extraction_method` when it supplies evidence.
 
 ### 3. Extraction
 
@@ -45,10 +47,21 @@ Example integration:
 from perd.pdf_extraction import run_pdf_extraction_pipeline
 
 extraction, report = run_pdf_extraction_pipeline(
-    document_text=pdf_markdown,
+    document_input="data/raw/pdf/paper-001.pdf",
     extractor=my_model_adapter,
     output_path="outputs/extractions/paper_extraction.json",
     paper_metadata={"paper_id": "paper-001", "doi": "10.xxxx/example"},
+)
+```
+
+Direct Markdown is also accepted:
+
+```python
+extraction, report = run_pdf_extraction_pipeline(
+    document_input=pdf_markdown,
+    input_format="markdown",
+    extractor=my_model_adapter,
+    output_path="outputs/extractions/paper_extraction.json",
 )
 ```
 
@@ -91,5 +104,5 @@ Database inclusion is a separate, explicit curation step. Only reviewed records 
 - Composition: final formula, dopant element, dopant site, dopant concentration.
 - Processing: calcination temperature, sintering temperature, sintering time, atmosphere.
 - Transport: total, bulk, and grain-boundary conductivity; activation energy.
-- Interface: interfacial resistance, CCD, and Li symmetric-cell lifetime.
+- Interface: interfacial resistance, critical current density, and Li symmetric-cell lifetime.
 - Battery: capacity retention and cycle number.

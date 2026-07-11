@@ -13,6 +13,8 @@ MISSING_VALUES = {"", "unknown", "none", "null", "n/a", "na"}
 REQUIRED_EVIDENCE_KEYS = (
     "field",
     "value",
+    "normalized_value",
+    "unit",
     "confidence",
     "source_page",
     "source_sentence",

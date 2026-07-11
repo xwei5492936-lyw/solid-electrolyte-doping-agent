@@ -7,7 +7,7 @@ import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from perd.evidence import EvidenceRecord
 from perd.evidence_validation import validate_evidence_payload
@@ -16,6 +16,90 @@ from perd.extraction_prompt import CRITICAL_EXTRACTION_FIELDS, build_extraction_
 
 SECTION_NAMES = tuple(CRITICAL_EXTRACTION_FIELDS)
 Extractor = Callable[[str], str | Mapping[str, Any]]
+PdfReaderFactory = Callable[[str | Path], Any]
+InputFormat = Literal["pdf", "text", "markdown"]
+
+FIELD_ALIASES = {
+    "CCD": "critical_current_density",
+    "Li_symmetric_lifetime": "li_symmetric_lifetime",
+}
+
+
+def extract_text_from_pdf(
+    pdf_path: str | Path,
+    reader_factory: PdfReaderFactory | None = None,
+) -> str:
+    """Extract page-marked text from a local PDF without downloading it."""
+
+    path = Path(pdf_path)
+    if not path.exists():
+        raise FileNotFoundError(f"PDF not found: {path}")
+    if path.suffix.lower() != ".pdf":
+        raise ValueError(f"expected a .pdf file: {path}")
+
+    if reader_factory is None:
+        try:
+            from pypdf import PdfReader
+        except ImportError as exc:
+            raise RuntimeError("PDF input requires pypdf; install project requirements") from exc
+        reader_factory = PdfReader
+
+    reader = reader_factory(path)
+    page_labels = getattr(reader, "page_labels", None)
+    page_blocks: list[str] = []
+    has_extractable_text = False
+    for index, page in enumerate(reader.pages):
+        label = page_labels[index] if page_labels and index < len(page_labels) else str(index + 1)
+        page_text = (page.extract_text() or "").strip()
+        has_extractable_text = has_extractable_text or bool(page_text)
+        page_blocks.append(f"[Page {label}]\n{page_text}")
+
+    document_text = "\n\n".join(page_blocks).strip()
+    if not has_extractable_text:
+        raise ValueError(f"PDF contains no extractable text: {path}; OCR is required before extraction")
+    return document_text
+
+
+def load_document_text(
+    document_input: str | Path,
+    input_format: InputFormat | None = None,
+    pdf_reader_factory: PdfReaderFactory | None = None,
+) -> str:
+    """Load a PDF path, text/Markdown path, or direct text/Markdown content."""
+
+    if input_format not in {None, "pdf", "text", "markdown"}:
+        raise ValueError(f"unsupported input_format: {input_format}")
+
+    if input_format == "pdf":
+        return extract_text_from_pdf(document_input, pdf_reader_factory)
+
+    if isinstance(document_input, Path):
+        path = document_input
+    else:
+        candidate = document_input.strip()
+        if input_format in {"text", "markdown"}:
+            if not candidate:
+                raise ValueError("document text must not be empty")
+            return document_input
+        path = Path(candidate) if "\n" not in candidate and len(candidate) < 1024 else None
+
+    if path is not None:
+        if path.exists():
+            if path.suffix.lower() == ".pdf":
+                return extract_text_from_pdf(path, pdf_reader_factory)
+            if path.suffix.lower() not in {".md", ".markdown", ".txt"}:
+                raise ValueError(f"unsupported document file type: {path.suffix or '<none>'}")
+            text = path.read_text(encoding="utf-8")
+            if not text.strip():
+                raise ValueError(f"document file is empty: {path}")
+            return text
+        if path.suffix.lower() in {".pdf", ".md", ".markdown", ".txt"}:
+            raise FileNotFoundError(f"document not found: {path}")
+
+    text = str(document_input)
+    if not text.strip():
+        raise ValueError("document text must not be empty")
+    return text
 
 
 def _record_to_output(record: EvidenceRecord) -> dict[str, Any]:
@@ -37,8 +121,9 @@ def _record_to_output(record: EvidenceRecord) -> dict[str, Any]:
 def _record_from_output(data: Mapping[str, Any]) -> EvidenceRecord:
     extracted_value = data.get("extracted_value", data.get("value", "unknown"))
     normalized_value = data.get("normalized_value")
+    field_name = str(data.get("field", "")).strip()
     return EvidenceRecord(
-        field_name=str(data.get("field", "")).strip(),
+        field_name=FIELD_ALIASES.get(field_name, field_name),
         extracted_value=extracted_value,
         normalized_value=normalized_value,
         unit=data.get("unit"),
@@ -144,6 +229,19 @@ def extract_document_text(
     return extraction
 
 
+def extract_document_input(
+    document_input: str | Path,
+    extractor: Extractor,
+    paper_metadata: Mapping[str, Any] | None = None,
+    input_format: InputFormat | None = None,
+    pdf_reader_factory: PdfReaderFactory | None = None,
+) -> PaperExtraction:
+    """Load PDF/text/Markdown input, then run evidence-aware extraction."""
+
+    document_text = load_document_text(document_input, input_format, pdf_reader_factory)
+    return extract_document_text(document_text, extractor, paper_metadata)
+
+
 def write_paper_extraction(
     extraction: PaperExtraction,
     output_path: str | Path = "paper_extraction.json",
@@ -162,14 +260,22 @@ def write_paper_extraction(
 
 
 def run_pdf_extraction_pipeline(
-    document_text: str,
+    document_input: str | Path,
     extractor: Extractor,
     output_path: str | Path = "paper_extraction.json",
     paper_metadata: Mapping[str, Any] | None = None,
+    input_format: InputFormat | None = None,
+    pdf_reader_factory: PdfReaderFactory | None = None,
 ) -> tuple[PaperExtraction, dict[str, Any]]:
-    """Extract, validate, and write a pending-review paper extraction."""
+    """Load, extract, validate, and write a pending-review paper extraction."""
 
-    extraction = extract_document_text(document_text, extractor, paper_metadata)
+    extraction = extract_document_input(
+        document_input,
+        extractor,
+        paper_metadata,
+        input_format,
+        pdf_reader_factory,
+    )
     report = extraction.validation_report()
     if report["valid"]:
         write_paper_extraction(extraction, output_path)

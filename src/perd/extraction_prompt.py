@@ -27,8 +27,8 @@ CRITICAL_EXTRACTION_FIELDS = {
     ),
     "interface": (
         "interfacial_resistance",
-        "CCD",
-        "Li_symmetric_lifetime",
+        "critical_current_density",
+        "li_symmetric_lifetime",
     ),
     "battery": (
         "capacity_retention",
