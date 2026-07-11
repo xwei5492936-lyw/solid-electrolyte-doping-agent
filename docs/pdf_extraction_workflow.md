@@ -25,6 +25,23 @@ Human review
 Separate database inclusion decision
 ```
 
+Extraction quality improvement uses a separate reviewed loop:
+
+```text
+AI extraction
+      |
+      v
+Human validation
+      |
+      v
+Gold standard
+      |
+      v
+Prompt refinement
+```
+
+Human reviewers record field-level decisions in `data/review/extraction_gold_standard.csv`. Run `python -m perd.extraction_evaluation` to generate overall and category-level accuracy. Empty or unreviewed rows are excluded; the framework reports `N/A` rather than inventing an accuracy value.
+
 ### 1. PDF Acquisition
 
 Acquire a paper through an open-access source or an authorized personal/institutional route. Keep the PDF local and outside version control. PDF acquisition is separate from PERD extraction.
