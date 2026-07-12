@@ -4,6 +4,29 @@ from __future__ import annotations
 
 CONFIDENCE_VALUES = ("high", "medium", "low", "unknown")
 
+COMPOSITION_METHOD_VALUES = ("nominal", "ICP", "EDS", "XRF", "neutron_refinement", "XRD_refinement", "other", "unknown")
+CONCENTRATION_BASIS_VALUES = ("formula_coefficient", "mol_percent", "atomic_percent", "weight_percent", "unknown")
+SITE_ASSIGNMENT_BASIS_VALUES = (
+    "explicitly_reported", "refinement_supported", "spectroscopy_supported",
+    "author_inference", "machine_inference", "unknown",
+)
+TRANSPORT_PROPERTY_TYPES = (
+    "total_ionic_conductivity", "bulk_ionic_conductivity", "grain_boundary_conductivity",
+    "electronic_conductivity", "activation_energy_total", "activation_energy_bulk",
+    "activation_energy_grain_boundary", "unknown",
+)
+RESISTANCE_TYPES = (
+    "grain_boundary_resistance", "electrode_interface_resistance",
+    "total_cell_resistance", "area_specific_resistance", "unresolved",
+)
+SAMPLE_RECORD_FIELDS = (
+    "sample_id", "sample_label", "nominal_formula", "final_formula",
+    "measured_composition", "composition_method", "dopants", "processing",
+    "phase_structure", "microstructure", "transport_measurements",
+    "resistance_measurements", "interface_measurements", "battery_measurements",
+    "evidence", "review_status",
+)
+
 PAPER_FIELDS = (
     "paper_id",
     "title",

@@ -12,6 +12,7 @@ from typing import Any, Literal
 from perd.evidence import EvidenceRecord
 from perd.evidence_validation import validate_evidence_payload
 from perd.extraction_prompt import CRITICAL_EXTRACTION_FIELDS, build_extraction_prompt
+from perd.sample_consistency import validate_sample_consistency
 
 
 SECTION_NAMES = tuple(CRITICAL_EXTRACTION_FIELDS)
@@ -180,6 +181,49 @@ class PaperExtraction:
         return validate_evidence_payload(self.to_dict())
 
 
+@dataclass(slots=True)
+class SampleLevelPaperExtraction:
+    """A review-gated v2 extraction with sample-scoped measurements."""
+
+    paper_metadata: dict[str, Any] = field(default_factory=dict)
+    sample_records: list[dict[str, Any]] = field(default_factory=list)
+    schema_version: str = "2.0"
+
+    def __post_init__(self) -> None:
+        self.paper_metadata = dict(self.paper_metadata)
+        self.paper_metadata["review_status"] = "pending"
+        self.paper_metadata["database_inclusion_status"] = "not_included"
+        self.sample_records = [dict(sample) for sample in self.sample_records]
+        for sample in self.sample_records:
+            sample.setdefault("review_status", "pending")
+            if sample.get("sample_id") == "unresolved":
+                for group in ("transport_measurements", "resistance_measurements", "interface_measurements", "battery_measurements"):
+                    for record in sample.get(group, []):
+                        if isinstance(record, dict) and record.get("confidence") == "high":
+                            record["confidence"] = "medium"
+                            record["needs_human_review"] = True
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "paper_metadata": dict(self.paper_metadata),
+            "sample_records": self.sample_records,
+        }
+
+    def validation_report(self) -> dict[str, Any]:
+        report = validate_sample_consistency(self.to_dict())
+        errors = [issue for issue in report["issues"] if issue["severity"] == "error"]
+        warnings = [issue for issue in report["issues"] if issue["severity"] != "error"]
+        return {
+            "valid": not errors,
+            "errors": errors,
+            "warnings": warnings,
+            "review_required": True,
+            "database_inclusion_allowed": False,
+            "consistency": report,
+        }
+
+
 def parse_extraction_json(response: str | Mapping[str, Any]) -> dict[str, Any]:
     """Parse a model response, accepting plain JSON or a fenced JSON block."""
 
@@ -195,12 +239,24 @@ def parse_extraction_json(response: str | Mapping[str, Any]) -> dict[str, Any]:
     return parsed
 
 
-def paper_extraction_from_dict(payload: Mapping[str, Any]) -> PaperExtraction:
+def paper_extraction_from_dict(payload: Mapping[str, Any]) -> PaperExtraction | SampleLevelPaperExtraction:
     """Convert a JSON-like extraction payload to EvidenceRecord objects."""
 
     metadata = payload.get("paper_metadata", {})
     if not isinstance(metadata, Mapping):
         raise ValueError("paper_metadata must be an object")
+
+    if "sample_records" in payload:
+        samples = payload.get("sample_records")
+        if not isinstance(samples, list):
+            raise ValueError("sample_records must be a list")
+        if not all(isinstance(sample, Mapping) for sample in samples):
+            raise ValueError("every sample record must be an object")
+        return SampleLevelPaperExtraction(
+            paper_metadata=dict(metadata),
+            sample_records=[dict(sample) for sample in samples],
+            schema_version=str(payload.get("schema_version", "2.0")),
+        )
 
     sections: dict[str, list[EvidenceRecord]] = {}
     for section in SECTION_NAMES:
@@ -216,7 +272,7 @@ def extract_document_text(
     document_text: str,
     extractor: Extractor,
     paper_metadata: Mapping[str, Any] | None = None,
-) -> PaperExtraction:
+) -> PaperExtraction | SampleLevelPaperExtraction:
     """Run an injected extractor on PDF text or Markdown and bind evidence."""
 
     prompt = build_extraction_prompt(document_text, paper_metadata)
@@ -235,7 +291,7 @@ def extract_document_input(
     paper_metadata: Mapping[str, Any] | None = None,
     input_format: InputFormat | None = None,
     pdf_reader_factory: PdfReaderFactory | None = None,
-) -> PaperExtraction:
+) -> PaperExtraction | SampleLevelPaperExtraction:
     """Load PDF/text/Markdown input, then run evidence-aware extraction."""
 
     document_text = load_document_text(document_input, input_format, pdf_reader_factory)
@@ -243,7 +299,7 @@ def extract_document_input(
 
 
 def write_paper_extraction(
-    extraction: PaperExtraction,
+    extraction: PaperExtraction | SampleLevelPaperExtraction,
     output_path: str | Path = "paper_extraction.json",
 ) -> Path:
     """Validate and write a review-gated extraction JSON file."""
@@ -266,7 +322,7 @@ def run_pdf_extraction_pipeline(
     paper_metadata: Mapping[str, Any] | None = None,
     input_format: InputFormat | None = None,
     pdf_reader_factory: PdfReaderFactory | None = None,
-) -> tuple[PaperExtraction, dict[str, Any]]:
+) -> tuple[PaperExtraction | SampleLevelPaperExtraction, dict[str, Any]]:
     """Load, extract, validate, and write a pending-review paper extraction."""
 
     extraction = extract_document_input(

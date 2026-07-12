@@ -1,0 +1,453 @@
+{
+  "schema_version": "2.0",
+  "paper_metadata": {
+    "paper_id": "B01-0072",
+    "title": "Structure and Ionic Conductivity of Ga and Nb Dual Doped LLZO Synthesized by Sol-Gel Method",
+    "doi": "10.5755/j02.ms.34240",
+    "review_status": "pending",
+    "database_inclusion_status": "not_included",
+    "source_classification": "experimental article",
+    "extraction_scope": "sample-level experimental facts only",
+    "pdf_metadata_warning": "Internal PDF title metadata conflicts with the rendered article title; rendered title and DOI were used."
+  },
+  "sample_records": [
+    {
+      "sample_id": "B01-0072-S01",
+      "sample_label": "x = 0",
+      "nominal_formula": "Li6.8La3Zr1.8Nb0.2O12",
+      "final_formula": "unknown",
+      "measured_composition": "unknown",
+      "composition_method": "nominal",
+      "composition_explanation": "Formula calculated from the explicitly reported nominal series; no measured elemental composition was reported.",
+      "dopants": [
+        {
+          "element": "Nb",
+          "site": "Zr",
+          "concentration_value": 0.2,
+          "concentration_basis": "formula_coefficient",
+          "site_assignment_basis": "explicitly_reported",
+          "sample_id": "B01-0072-S01",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Results and Discussion",
+            "source_sentence": "Nb occupies the Zr site, while Ga is used to occupy the Li sites.",
+            "extraction_method": "body_text"
+          }
+        }
+      ],
+      "processing": [
+        {
+          "process_type": "calcination",
+          "sample_id": "B01-0072-S01",
+          "value": 800,
+          "unit": "C",
+          "time_value": 8,
+          "time_unit": "h",
+          "atmosphere": "air",
+          "evidence": {
+            "source_page": "PDF 2 (printed p. 9)",
+            "source_section": "Section 2.1",
+            "source_sentence": "The gels were calcined in air at 800 C for 8 h.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        },
+        {
+          "process_type": "sintering",
+          "sample_id": "B01-0072-S01",
+          "value": 1100,
+          "unit": "C",
+          "time_value": 8,
+          "time_unit": "h",
+          "atmosphere": "unknown",
+          "mother_powder_covering": true,
+          "evidence": {
+            "source_page": "PDF 2 (printed p. 9)",
+            "source_section": "Section 2.1",
+            "source_sentence": "Pellets covered in master powders were sintered at 1100 C for 8 h.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "phase_structure": [
+        {
+          "sample_id": "B01-0072-S01",
+          "phase": "cubic LLZO",
+          "source_type": "XRD",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Fig. 3 and Results",
+            "source_sentence": "The ceramic samples in the reported series are assigned to cubic LLZO.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "microstructure": [],
+      "transport_measurements": [],
+      "resistance_measurements": [],
+      "interface_measurements": [],
+      "battery_measurements": [],
+      "evidence": [
+        {
+          "source_page": "PDF 3 (printed p. 10)",
+          "source_section": "Fig. 3",
+          "source_sentence": "Fig. 3 identifies ceramic samples x = 0, 0.1, 0.2, and 0.3.",
+          "extraction_method": "figure_caption"
+        }
+      ],
+      "review_status": "pending"
+    },
+    {
+      "sample_id": "B01-0072-S02",
+      "sample_label": "x = 0.1",
+      "nominal_formula": "Li6.5Ga0.1La3Zr1.8Nb0.2O12",
+      "final_formula": "unknown",
+      "measured_composition": "unknown",
+      "composition_method": "nominal",
+      "composition_explanation": "Formula calculated from the explicitly reported nominal series; no measured elemental composition was reported.",
+      "dopants": [
+        {
+          "element": "Ga",
+          "site": "Li",
+          "concentration_value": 0.1,
+          "concentration_basis": "formula_coefficient",
+          "site_assignment_basis": "explicitly_reported",
+          "sample_id": "B01-0072-S02",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Results and Discussion",
+            "source_sentence": "Nb occupies the Zr site, while Ga is used to occupy the Li sites.",
+            "extraction_method": "body_text"
+          }
+        },
+        {
+          "element": "Nb",
+          "site": "Zr",
+          "concentration_value": 0.2,
+          "concentration_basis": "formula_coefficient",
+          "site_assignment_basis": "explicitly_reported",
+          "sample_id": "B01-0072-S02",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Results and Discussion",
+            "source_sentence": "Nb occupies the Zr site, while Ga is used to occupy the Li sites.",
+            "extraction_method": "body_text"
+          }
+        }
+      ],
+      "processing": [
+        {
+          "process_type": "calcination",
+          "sample_id": "B01-0072-S02",
+          "value": 800,
+          "unit": "C",
+          "time_value": 8,
+          "time_unit": "h",
+          "atmosphere": "air",
+          "evidence": {
+            "source_page": "PDF 2 (printed p. 9)",
+            "source_section": "Section 2.1",
+            "source_sentence": "The gels were calcined in air at 800 C for 8 h.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        },
+        {
+          "process_type": "sintering",
+          "sample_id": "B01-0072-S02",
+          "value": 1100,
+          "unit": "C",
+          "time_value": 8,
+          "time_unit": "h",
+          "atmosphere": "unknown",
+          "mother_powder_covering": true,
+          "evidence": {
+            "source_page": "PDF 2 (printed p. 9)",
+            "source_section": "Section 2.1",
+            "source_sentence": "Pellets covered in master powders were sintered at 1100 C for 8 h.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "phase_structure": [
+        {
+          "sample_id": "B01-0072-S02",
+          "phase": "cubic LLZO",
+          "source_type": "XRD",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Fig. 3 and Results",
+            "source_sentence": "The ceramic samples in the reported series are assigned to cubic LLZO.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "microstructure": [],
+      "transport_measurements": [],
+      "resistance_measurements": [],
+      "interface_measurements": [],
+      "battery_measurements": [],
+      "evidence": [
+        {
+          "source_page": "PDF 3 (printed p. 10)",
+          "source_section": "Fig. 3",
+          "source_sentence": "Fig. 3 identifies ceramic samples x = 0, 0.1, 0.2, and 0.3.",
+          "extraction_method": "figure_caption"
+        }
+      ],
+      "review_status": "pending"
+    },
+    {
+      "sample_id": "B01-0072-S03",
+      "sample_label": "x = 0.2",
+      "nominal_formula": "Li6.2Ga0.2La3Zr1.8Nb0.2O12",
+      "final_formula": "unknown",
+      "measured_composition": "unknown",
+      "composition_method": "nominal",
+      "composition_explanation": "Formula calculated from the explicitly reported nominal series; no measured elemental composition was reported.",
+      "dopants": [
+        {
+          "element": "Ga",
+          "site": "Li",
+          "concentration_value": 0.2,
+          "concentration_basis": "formula_coefficient",
+          "site_assignment_basis": "explicitly_reported",
+          "sample_id": "B01-0072-S03",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Results and Discussion",
+            "source_sentence": "Nb occupies the Zr site, while Ga is used to occupy the Li sites.",
+            "extraction_method": "body_text"
+          }
+        },
+        {
+          "element": "Nb",
+          "site": "Zr",
+          "concentration_value": 0.2,
+          "concentration_basis": "formula_coefficient",
+          "site_assignment_basis": "explicitly_reported",
+          "sample_id": "B01-0072-S03",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Results and Discussion",
+            "source_sentence": "Nb occupies the Zr site, while Ga is used to occupy the Li sites.",
+            "extraction_method": "body_text"
+          }
+        }
+      ],
+      "processing": [
+        {
+          "process_type": "calcination",
+          "sample_id": "B01-0072-S03",
+          "value": 800,
+          "unit": "C",
+          "time_value": 8,
+          "time_unit": "h",
+          "atmosphere": "air",
+          "evidence": {
+            "source_page": "PDF 2 (printed p. 9)",
+            "source_section": "Section 2.1",
+            "source_sentence": "The gels were calcined in air at 800 C for 8 h.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        },
+        {
+          "process_type": "sintering",
+          "sample_id": "B01-0072-S03",
+          "value": 1100,
+          "unit": "C",
+          "time_value": 8,
+          "time_unit": "h",
+          "atmosphere": "unknown",
+          "mother_powder_covering": true,
+          "evidence": {
+            "source_page": "PDF 2 (printed p. 9)",
+            "source_section": "Section 2.1",
+            "source_sentence": "Pellets covered in master powders were sintered at 1100 C for 8 h.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "phase_structure": [
+        {
+          "sample_id": "B01-0072-S03",
+          "phase": "cubic LLZO",
+          "source_type": "XRD",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Fig. 3 and Results",
+            "source_sentence": "The ceramic samples in the reported series are assigned to cubic LLZO.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "microstructure": [],
+      "transport_measurements": [
+        {
+          "measurement_id": "B01-0072-S03-T01",
+          "sample_id": "B01-0072-S03",
+          "property_type": "total_ionic_conductivity",
+          "value": "3.7 x 10^-4 S cm^-1",
+          "normalized_value": 0.00037,
+          "original_unit": "S cm^-1",
+          "normalized_unit": "S/cm",
+          "temperature_value": "room temperature",
+          "temperature_unit": "as reported",
+          "frequency_range": "0.01 to 10^6 Hz",
+          "atmosphere": "unknown",
+          "electrode_type": "silver blocking electrode",
+          "fitting_method": "total resistance from EIS",
+          "source_type": "body_text",
+          "evidence": {
+            "source_page": "PDF 1 and 5 (printed pp. 8 and 12)",
+            "source_section": "Abstract and Conclusions",
+            "source_sentence": "The x = 0.2 sample has total ionic conductivity of 3.7 x 10^-4 S cm^-1 at room temperature.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "resistance_measurements": [
+        {
+          "measurement_id": "B01-0072-S03-R01",
+          "sample_id": "B01-0072-S03",
+          "resistance_type": "total_cell_resistance",
+          "value": "minimum among the reported series",
+          "measurement_domain": "transport",
+          "normalized_value": null,
+          "original_unit": "qualitative",
+          "normalized_unit": null,
+          "electrode_type": "silver blocking electrode",
+          "needs_human_review": false,
+          "evidence": {
+            "source_page": "PDF 4-5 (printed pp. 11-12)",
+            "source_section": "Results and Discussion",
+            "source_sentence": "The total resistance reaches its minimum at x = 0.2.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "interface_measurements": [],
+      "battery_measurements": [],
+      "evidence": [
+        {
+          "source_page": "PDF 3 (printed p. 10)",
+          "source_section": "Fig. 3",
+          "source_sentence": "Fig. 3 identifies ceramic samples x = 0, 0.1, 0.2, and 0.3.",
+          "extraction_method": "figure_caption"
+        }
+      ],
+      "review_status": "pending"
+    },
+    {
+      "sample_id": "B01-0072-S04",
+      "sample_label": "x = 0.3",
+      "nominal_formula": "Li5.9Ga0.3La3Zr1.8Nb0.2O12",
+      "final_formula": "unknown",
+      "measured_composition": "unknown",
+      "composition_method": "nominal",
+      "composition_explanation": "Formula calculated from the explicitly reported nominal series; no measured elemental composition was reported.",
+      "dopants": [
+        {
+          "element": "Ga",
+          "site": "Li",
+          "concentration_value": 0.3,
+          "concentration_basis": "formula_coefficient",
+          "site_assignment_basis": "explicitly_reported",
+          "sample_id": "B01-0072-S04",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Results and Discussion",
+            "source_sentence": "Nb occupies the Zr site, while Ga is used to occupy the Li sites.",
+            "extraction_method": "body_text"
+          }
+        },
+        {
+          "element": "Nb",
+          "site": "Zr",
+          "concentration_value": 0.2,
+          "concentration_basis": "formula_coefficient",
+          "site_assignment_basis": "explicitly_reported",
+          "sample_id": "B01-0072-S04",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Results and Discussion",
+            "source_sentence": "Nb occupies the Zr site, while Ga is used to occupy the Li sites.",
+            "extraction_method": "body_text"
+          }
+        }
+      ],
+      "processing": [
+        {
+          "process_type": "calcination",
+          "sample_id": "B01-0072-S04",
+          "value": 800,
+          "unit": "C",
+          "time_value": 8,
+          "time_unit": "h",
+          "atmosphere": "air",
+          "evidence": {
+            "source_page": "PDF 2 (printed p. 9)",
+            "source_section": "Section 2.1",
+            "source_sentence": "The gels were calcined in air at 800 C for 8 h.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        },
+        {
+          "process_type": "sintering",
+          "sample_id": "B01-0072-S04",
+          "value": 1100,
+          "unit": "C",
+          "time_value": 8,
+          "time_unit": "h",
+          "atmosphere": "unknown",
+          "mother_powder_covering": true,
+          "evidence": {
+            "source_page": "PDF 2 (printed p. 9)",
+            "source_section": "Section 2.1",
+            "source_sentence": "Pellets covered in master powders were sintered at 1100 C for 8 h.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "phase_structure": [
+        {
+          "sample_id": "B01-0072-S04",
+          "phase": "cubic LLZO",
+          "source_type": "XRD",
+          "evidence": {
+            "source_page": "PDF 3 (printed p. 10)",
+            "source_section": "Fig. 3 and Results",
+            "source_sentence": "The ceramic samples in the reported series are assigned to cubic LLZO.",
+            "extraction_method": "body_text"
+          },
+          "confidence": "high"
+        }
+      ],
+      "microstructure": [],
+      "transport_measurements": [],
+      "resistance_measurements": [],
+      "interface_measurements": [],
+      "battery_measurements": [],
+      "evidence": [
+        {
+          "source_page": "PDF 3 (printed p. 10)",
+          "source_section": "Fig. 3",
+          "source_sentence": "Fig. 3 identifies ceramic samples x = 0, 0.1, 0.2, and 0.3.",
+          "extraction_method": "figure_caption"
+        }
+      ],
+      "review_status": "pending"
+    }
+  ]
+}
